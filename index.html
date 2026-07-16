@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waypoint — Walking Tracker</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="topo-layer" aria-hidden="true"></div>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <svg class="brand-mark" width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 5.5c0 2-1.6 3.6-3.6 3.6S6.8 7.5 6.8 5.5 8.4 1.9 10.4 1.9 14 3.5 14 5.5z" fill="var(--accent)"/>
+        <path d="M9.6 11.5l-2.2 6.8-3 4.6" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M24 15.2c0 2-1.6 3.6-3.6 3.6s-3.6-1.6-3.6-3.6 1.6-3.6 3.6-3.6 3.6 1.6 3.6 3.6z" fill="var(--moss)"/>
+        <path d="M19.6 21.2l-2.2 6.8-3 4.1" stroke="var(--moss)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div class="brand-text">
+        <span class="brand-name">Waypoint</span>
+        <span class="brand-sub">walking tracker</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <span id="statusPill" class="status-pill status-idle">
+        <span class="status-dot"></span>
+        <span id="statusLabel">Stopped</span>
+      </span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Dashboard -->
+    <section class="dashboard">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <span class="stat-icon">🚶</span>
+          <span class="stat-value" id="statDistance">0.00<small>km</small></span>
+          <span class="stat-label">Distance</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">👣</span>
+          <span class="stat-value" id="statSteps">0</span>
+          <span class="stat-label">Steps</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">⏱</span>
+          <span class="stat-value mono" id="statTime">00:00:00</span>
+          <span class="stat-label">Walking time</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">📅</span>
+          <span class="stat-value" id="statDate">—</span>
+          <span class="stat-label">Today</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="btnStart" class="btn btn-primary">Start Walk</button>
+        <button id="btnPause" class="btn btn-secondary hidden">Pause</button>
+        <button id="btnResume" class="btn btn-secondary hidden">Resume</button>
+        <button id="btnStop" class="btn btn-stop hidden">Stop</button>
+      </div>
+      <p id="gpsMessage" class="gps-message"></p>
+    </section>
+
+    <!-- Live tracking panel -->
+    <section id="livePanel" class="live-panel hidden">
+      <div class="live-readouts">
+        <div class="readout">
+          <span class="readout-label">Elapsed</span>
+          <span class="readout-value mono" id="liveTime">00:00:00</span>
+        </div>
+        <div class="readout">
+          <span class="readout-label">Distance</span>
+          <span class="readout-value mono" id="liveDistance">0.00 <small>km</small></span>
+        </div>
+        <div class="readout">
+          <span class="readout-label">Est. steps</span>
+          <span class="readout-value mono" id="liveSteps">0</span>
+        </div>
+        <div class="readout">
+          <span class="readout-label">GPS accuracy</span>
+          <span class="readout-value mono" id="liveAccuracy">— m</span>
+        </div>
+      </div>
+      <div class="trail-wrap">
+        <canvas id="trailCanvas" width="600" height="320"></canvas>
+        <span class="trail-caption">your route, traced live</span>
+      </div>
+    </section>
+
+    <!-- Saved walks -->
+    <section class="history">
+      <div class="history-header">
+        <h2>Saved walks</h2>
+        <span class="history-count" id="historyCount">0 walks logged</span>
+      </div>
+      <div id="walksList" class="walks-list">
+        <!-- Walk cards injected here -->
+      </div>
+      <div id="emptyState" class="empty-state">
+        <p>No walks yet.</p>
+        <p class="empty-sub">Tap <strong>Start Walk</strong> and your first trail will land here.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <span>Distances calculated from GPS coordinates · steps estimated at 0.75m stride</span>
+  </footer>
+</div>
+
+<!-- Save Walk Modal -->
+<div id="saveModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h3>Save this walk</h3>
+    <div class="modal-summary">
+      <div><span>Date</span><strong id="sumDate">—</strong></div>
+      <div><span>Duration</span><strong id="sumDuration">—</strong></div>
+      <div><span>Distance</span><strong id="sumDistance">—</strong></div>
+      <div><span>Steps</span><strong id="sumSteps">—</strong></div>
+    </div>
+    <label class="field-label" for="walkName">Walk name <span class="required">required</span></label>
+    <input id="walkName" type="text" placeholder="e.g. Morning Walk" maxlength="40">
+    <label class="field-label" for="walkNotes">Notes <span class="optional">optional</span></label>
+    <textarea id="walkNotes" rows="3" placeholder="How did it feel?"></textarea>
+    <p id="nameError" class="field-error hidden">Give this walk a name before saving.</p>
+    <div class="modal-actions">
+      <button id="btnCancelSave" class="btn btn-secondary">Cancel</button>
+      <button id="btnSaveWalk" class="btn btn-primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
