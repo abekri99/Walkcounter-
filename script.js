@@ -1,5 +1,5 @@
 // ===================== State =====================
-const STEP_LENGTH_M = 0.75; // average stride length in meters
+const STEP_LENGTH_M = 0.65; // average stride length in meters
 const STORAGE_KEY = 'waypoint_walks';
 
 let state = 'idle'; // idle | walking | paused
