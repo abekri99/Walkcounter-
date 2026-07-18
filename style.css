@@ -1,7 +1,7 @@
 :root {
   --bg: #FFCOCB;
-  --bg-panel: #1f2b23;
-  --bg-elevated: #26362c;
+  --bg-panel: #FFCOCB;
+  --bg-elevated: #FFCOCB;
   --border: rgba(234, 239, 230, 0.09);
   --text: #eaefe6;
   --text-muted: #93a697;
